@@ -21,5 +21,5 @@ func Copy(dst, src interface{}) interface{} {
 // CopyAndDereference returns the deferenced value of the copy of src as stored at dst
 func CopyAndDereference(dst, src interface{}) interface{} {
 	copy := Copy(dst, src)
-	return reflect.ValueOf(copy).Elem()
+	return reflect.ValueOf(copy).Elem().Interface()
 }
