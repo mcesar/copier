@@ -30,13 +30,12 @@ func CopyAndDereference(dst, src interface{}) interface{} {
 }
 
 // CopyPB returns a deep copy of src as stored at dst
-func CopyPB(dst, src proto.Message) interface{} {
-	var buf bytes.Buffer
-	err := (&jsonpb.Marshaler{}).Marshal(&buf, src)
+func CopyPB(dst proto.Message, src interface{}) interface{} {
+	b, err := json.Marshal(src)
 	if err != nil {
 		panic(err)
 	}
-	err = jsonpb.Unmarshal(&buf, dst)
+	err = jsonpb.Unmarshal(bytes.NewReader(b), dst)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +43,7 @@ func CopyPB(dst, src proto.Message) interface{} {
 }
 
 // CopyPBAndDereference returns the deferenced value of the copy of src as stored at dst
-func CopyPBAndDereference(dst, src proto.Message) interface{} {
+func CopyPBAndDereference(dst proto.Message, src interface{}) interface{} {
 	copy := CopyPB(dst, src)
 	return reflect.ValueOf(copy).Elem().Interface()
 }
