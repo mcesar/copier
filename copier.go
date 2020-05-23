@@ -8,6 +8,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 // Copy returns a deep copy of src as stored at dst
@@ -38,6 +40,9 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		m := &jsonpb.Marshaler{EnumsAsInts: true}
 		err = m.Marshal(&buf, srcPB)
 		b = buf.Bytes()
+	} else if srcPB, ok := src.(protov2.Message); ok {
+		mo := protojson.MarshalOptions{UseEnumNumbers: true}
+		b, err = mo.Marshal(srcPB)
 	} else {
 		b, err = json.Marshal(src)
 	}
@@ -48,6 +53,10 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		u := jsonpb.Unmarshaler{}
 		u.AllowUnknownFields = true
 		err = u.Unmarshal(bytes.NewReader(b), dstPB)
+		dst = dstPB
+	} else if dstPB, ok := src.(protov2.Message); ok {
+		uo := protojson.UnmarshalOptions{DiscardUnknown: false}
+		uo.Unmarshal(b, dstPB)
 		dst = dstPB
 	} else {
 		err = json.Unmarshal(b, dst)
