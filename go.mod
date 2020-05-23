@@ -1,4 +1,4 @@
-module github.com/bandarrinha/copier
+module github.com/mcesar/copier
 
 go 1.13
 
