@@ -54,9 +54,9 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		u.AllowUnknownFields = true
 		err = u.Unmarshal(bytes.NewReader(b), dstPB)
 		dst = dstPB
-	} else if dstPB, ok := src.(protov2.Message); ok {
+	} else if dstPB, ok := dst.(protov2.Message); ok {
 		uo := protojson.UnmarshalOptions{DiscardUnknown: false}
-		uo.Unmarshal(b, dstPB)
+		err = uo.Unmarshal(b, dstPB)
 		dst = dstPB
 	} else {
 		err = json.Unmarshal(b, dst)
