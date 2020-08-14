@@ -3,6 +3,7 @@ package copier
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"reflect"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -45,6 +46,9 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		var buf bytes.Buffer
 		m := &jsonpb.Marshaler{EnumsAsInts: true}
 		err = m.Marshal(&buf, srcPB)
+		if err != nil {
+			err = fmt.Errorf("could not Marshal proto.Message: %v", err)
+		}
 		b = buf.Bytes()
 	} else if srcPB, ok := src.(protov2.Message); ok {
 		if srcPB == nil || !srcPB.ProtoReflect().IsValid() {
@@ -52,6 +56,9 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		}
 		mo := protojson.MarshalOptions{UseEnumNumbers: true}
 		b, err = mo.Marshal(srcPB)
+		if err != nil {
+			err = fmt.Errorf("could not Marshal protov2.Message: %v", err)
+		}
 	} else {
 		b, err = json.Marshal(src)
 	}
