@@ -42,7 +42,7 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 	if srcPB, ok := src.(proto.Message); ok {
 		v := reflect.ValueOf(srcPB)
 		if srcPB == nil || (v.Kind() == reflect.Ptr && v.IsNil()) {
-			return nil
+			return dst
 		}
 		var buf bytes.Buffer
 		m := &jsonpb.Marshaler{EnumsAsInts: true}
@@ -53,7 +53,7 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		b = buf.Bytes()
 	} else if srcPB, ok := src.(protov2.Message); ok {
 		if srcPB == nil || !srcPB.ProtoReflect().IsValid() {
-			return nil
+			return dst
 		}
 		mo := protojson.MarshalOptions{UseEnumNumbers: true}
 		b, err = mo.Marshal(srcPB)
@@ -88,8 +88,5 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 // CopyPBAndDereference returns the deferenced value of the copy of src as stored at dst
 func CopyPBAndDereference(dst interface{}, src interface{}) interface{} {
 	copy := CopyPB(dst, src)
-	if copy == nil {
-		return nil
-	}
 	return reflect.ValueOf(copy).Elem().Interface()
 }
