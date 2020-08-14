@@ -40,7 +40,8 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 	var b []byte
 	var err error
 	if srcPB, ok := src.(proto.Message); ok {
-		if srcPB == nil {
+		v := reflect.ValueOf(srcPB)
+		if srcPB == nil || (v.Kind() == reflect.Ptr && v.IsNil()) {
 			return nil
 		}
 		var buf bytes.Buffer
