@@ -33,14 +33,23 @@ func CopyAndDereference(dst, src interface{}) interface{} {
 
 // CopyPB returns a deep copy of src as stored at dst
 func CopyPB(dst interface{}, src interface{}) interface{} {
+	if src == nil {
+		return nil
+	}
 	var b []byte
 	var err error
 	if srcPB, ok := src.(proto.Message); ok {
+		if srcPB == nil {
+			return nil
+		}
 		var buf bytes.Buffer
 		m := &jsonpb.Marshaler{EnumsAsInts: true}
 		err = m.Marshal(&buf, srcPB)
 		b = buf.Bytes()
 	} else if srcPB, ok := src.(protov2.Message); ok {
+		if srcPB == nil {
+			return nil
+		}
 		mo := protojson.MarshalOptions{UseEnumNumbers: true}
 		b, err = mo.Marshal(srcPB)
 	} else {
@@ -71,5 +80,8 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 // CopyPBAndDereference returns the deferenced value of the copy of src as stored at dst
 func CopyPBAndDereference(dst interface{}, src interface{}) interface{} {
 	copy := CopyPB(dst, src)
+	if copy == nil {
+		return nil
+	}
 	return reflect.ValueOf(copy).Elem().Interface()
 }
