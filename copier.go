@@ -39,7 +39,7 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 	var b []byte
 	var err error
 	if srcPB, ok := src.(proto.Message); ok {
-		if srcPB == nil {
+		if srcPB == nil || !srcPB.ProtoReflect().IsValid() {
 			return nil
 		}
 		var buf bytes.Buffer
@@ -47,7 +47,7 @@ func CopyPB(dst interface{}, src interface{}) interface{} {
 		err = m.Marshal(&buf, srcPB)
 		b = buf.Bytes()
 	} else if srcPB, ok := src.(protov2.Message); ok {
-		if srcPB == nil {
+		if srcPB == nil || !srcPB.ProtoReflect().IsValid()  {
 			return nil
 		}
 		mo := protojson.MarshalOptions{UseEnumNumbers: true}
